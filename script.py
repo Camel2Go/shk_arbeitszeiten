@@ -34,6 +34,7 @@ def fetch_pdf(url_pdf):
 	
 	resp = get(url_pdf)
 
+	# in case we are on the other side of the zih-firewall  
 	while not "application/pdf" in resp.headers.get("Content-Type"):
 	
 		print("[!] couldn't fetch pdf, got \"" + resp.headers.get("Content-Type") + "\" instead of \"application/pdf\"")
