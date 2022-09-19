@@ -141,10 +141,10 @@ def print_url(url, text):
 
 if __name__ == "__main__":
 	
-	# try: from fillpdf import fillpdfs
-	# except ModuleNotFoundError: 
-		# print("please install " + print_url(url_fillpdf, "fillpdf") + ": \"pip3 install fillpdf\"")
-		# exit(-1)
+	try: from fillpdf import fillpdfs
+	except ModuleNotFoundError: 
+		print("please install " + print_url(url_fillpdf, "fillpdf") + ": \"pip3 install fillpdf\"")
+		exit(-1)
 
 	print("[+] trying to fetch newest pdf from verw.tu-dresden.de...")
 	pdf = fetch_pdf(url_pdf)
@@ -172,6 +172,6 @@ if __name__ == "__main__":
 		file.write(fdf)
 	print("done!")
 
-	# fillpdfs.write_fillable_pdf(filename, filename, data)
+	fillpdfs.write_fillable_pdf(filename, filename, data)
 	print(f"[+] all done :)")
-	print(f"[+] pdftk arbeitszeitnachweis.pdf fill_form {filename}.fdf output {filename}.pdf")
+	# print(f"[+] pdftk arbeitszeitnachweis.pdf fill_form {filename}.fdf output {filename}.pdf")
