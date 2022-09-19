@@ -4,16 +4,17 @@
 from datetime import datetime
 from calendar import different_locale, month_name, monthrange
 from requests import get
+from os import system
 
 
 # https://www.verw.tu-dresden.de/verwricht/formulare/download.asp?file=Arbeitszeitnachweis%20Mindestlohngesetz.pdf
 # https://www.verw.tu-dresden.de/formupdate.asp?FileName=Arbeitszeitnachweis gem. Mindestlohngesetz&FileDate=29.03.2021 05:31:10&Subject=D2.4/1 - Stand 18.02.2021 (29.03.2021)
 # https://www.verw.tu-dresden.de/verwricht/formulare/download.asp?file=Arbeitszeitnachweis%20Mindestlohngesetz.pdf&sid=C4CB95D3F15A4B34B893AE290001304A
 # https://tu-dresden.de/intern/verwaltung/interne_anmeldung
+# url_fillpdf = "https://pypi.org/project/fillpdf/"
 
 url_pdf = "https://www.verw.tu-dresden.de/verwricht/formulare/download.asp?file=Arbeitszeitnachweis%20Mindestlohngesetz.pdf"
 url_vpn = "https://tu-dresden.de/zih/dienste/service-katalog/arbeitsumgebung/zugang_datennetz/vpn"
-url_fillpdf = "https://pypi.org/project/fillpdf/"
 
 
 data = {
@@ -141,10 +142,10 @@ def print_url(url, text):
 
 if __name__ == "__main__":
 	
-	try: from fillpdf import fillpdfs
-	except ModuleNotFoundError: 
-		print("please install " + print_url(url_fillpdf, "fillpdf") + ": \"pip3 install fillpdf\"")
-		exit(-1)
+	# try: from fillpdf import fillpdfs
+	# except ModuleNotFoundError: 
+		# print("please install " + print_url(url_fillpdf, "fillpdf") + ": \"pip3 install fillpdf\"")
+		# exit(-1)
 
 	print("[+] trying to fetch newest pdf from verw.tu-dresden.de...")
 	pdf = fetch_pdf(url_pdf)
@@ -172,6 +173,8 @@ if __name__ == "__main__":
 		file.write(fdf)
 	print("done!")
 
-	fillpdfs.write_fillable_pdf(filename, filename, data)
-	print(f"[+] all done :)")
+	# fillpdfs.write_fillable_pdf("arbeitszeitnachweis.pdf", filename + ".pdf", data)
 	# print(f"[+] pdftk arbeitszeitnachweis.pdf fill_form {filename}.fdf output {filename}.pdf")
+	print("[+] executing pdftk to fill form-data in pdf...")
+	system(f"LD_LIBRARY_PATH=. ./pdftk arbeitszeitnachweis.pdf fill_form {filename}.fdf output {filename}.pdf ")
+	print(f"[+] all done :)")
