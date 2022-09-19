@@ -1,4 +1,5 @@
 <?php
+    $error = "";
     if(isset($_POST["nachname"]) && !empty($_POST["nachname"])) {
         // create JSON object for python
         $personal = array();
@@ -13,9 +14,11 @@
         $personal["Wochenstunden"] = str_replace(",", ".", $_POST["wochenstunden"]);
 
         $worktime = array();
+        $gesamtstunden = 0;
         for($i = 0; $i < 5; $i++) {
             $zeit = str_replace(",", ".", $_POST["arbeitszeit_".$i]);
             $zeit_zahl = floatval($zeit);
+            $gesamtstunden += $zeit_zahl;
             $stunden = floor($zeit_zahl);
             $minuten = floor(60.0 * ($zeit_zahl - $stunden));
 
@@ -35,28 +38,32 @@
         $fillmonth = explode("-", $_POST["month"]);
         $month = array("year" => $fillmonth[0], "month" => $fillmonth[1]);
 
-        $json = json_encode(array("personal" => $personal, "worktime" => $worktime, "month" => $month));
-        echo $json;
+        if($gesamtstunden == floatval($personal["Wochenstunden"])) {
+            $json = json_encode(array("personal" => $personal, "worktime" => $worktime, "month" => $month));
+            echo $json;
 
-        // execute python file
-        // filename will be either known from input or returned by python script
-        // $filename = "arbeitszeitnachweis.pdf";
+            // execute python file
+            // filename will be either known from input or returned by python script
+            // $filename = "arbeitszeitnachweis.pdf";
 
-        // // download finished pdf
-        // if(file_exists($filename)) {
-        //     header('Content-Description: File Transfer');
-        //     header('Content-Type: application/octet-stream');
-        //     header('Expires: 0');
-        //     header('Content-Disposition: attachment; filename="' . basename($filename) . '"');
-        //     header('Content-Length: ' . filesize($filename));
-        //     header('Pragma: public'); //?
+            // // download finished pdf
+            // if(file_exists($filename)) {
+            //     header('Content-Description: File Transfer');
+            //     header('Content-Type: application/octet-stream');
+            //     header('Expires: 0');
+            //     header('Content-Disposition: attachment; filename="' . basename($filename) . '"');
+            //     header('Content-Length: ' . filesize($filename));
+            //     header('Pragma: public'); //?
 
-        //     flush();
-        //     readfile($filename);
-        //     die();
-        // }
+            //     flush();
+            //     readfile($filename);
+            //     die();
+            // }
 
-        // delete pdf
+            // delete pdf
+        } else {
+            $error = "Mehr Stunden gearbeitet als angegeben.";
+        }
     }
 ?>
 <!DOCTYPE html>
@@ -70,6 +77,13 @@
         <a id="downloadAnchorElem" style="display:none;"></a>
 
         <form name="form" method="post">
+            <?php
+                if($error != "") {
+                    echo '<div class="error">';
+                    echo $error;
+                    echo '</div>';
+                }
+            ?>
             <h2>SHK - Arbeitszeitnachweis</h2>
 
             <h3>

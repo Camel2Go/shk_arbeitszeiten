@@ -107,6 +107,14 @@ div.field:focus-within::after {
     opacity: 1;
 }
 
+div.error {
+    border: 1px solid red;
+    border-radius: 10px;
+    padding: 10px;
+    background-color: #ff000030;
+    font-weight: bold;
+}
+
 button {
     display: block;
     width: 100%;
