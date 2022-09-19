@@ -4,7 +4,7 @@
 from datetime import datetime
 from calendar import different_locale, month_name, monthrange
 from requests import get
-from os import system
+from subprocess import run
 
 
 # https://www.verw.tu-dresden.de/verwricht/formulare/download.asp?file=Arbeitszeitnachweis%20Mindestlohngesetz.pdf
@@ -175,6 +175,7 @@ if __name__ == "__main__":
 
 	# fillpdfs.write_fillable_pdf("arbeitszeitnachweis.pdf", filename + ".pdf", data)
 	# print(f"[+] pdftk arbeitszeitnachweis.pdf fill_form {filename}.fdf output {filename}.pdf")
-	print("[+] executing pdftk to fill form-data in pdf...")
-	system(f"LD_LIBRARY_PATH=. ./pdftk arbeitszeitnachweis.pdf fill_form {filename}.fdf output {filename}.pdf ")
+	print("[+] executing qpdf and pdftk to generate filled pdf...")
+	run(["qpdf", "--decrypt", "--replace-input", "arbeitszeitnachweis.pdf"], check = True, env = {"PATH": "./", "LD_LIBRARY_PATH": "/home/camel2go/.local/lib"})
+	run(["pdftk", "arbeitszeitnachweis.pdf" ,"fill_form" , filename + ".fdf", "output", filename + ".pdf"], check = True, env = {"PATH": "./", "LD_LIBRARY_PATH": "/home/camel2go/.local/lib"})
 	print(f"[+] all done :)")
