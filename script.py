@@ -176,6 +176,6 @@ if __name__ == "__main__":
 	# fillpdfs.write_fillable_pdf("arbeitszeitnachweis.pdf", filename + ".pdf", data)
 	# print(f"[+] pdftk arbeitszeitnachweis.pdf fill_form {filename}.fdf output {filename}.pdf")
 	print("[+] executing qpdf and pdftk to generate filled pdf...")
-	run(["qpdf", "--decrypt", "--replace-input", "arbeitszeitnachweis.pdf"], check = True, env = {"PATH": "./", "LD_LIBRARY_PATH": "/home/camel2go/.local/lib"})
-	run(["pdftk", "arbeitszeitnachweis.pdf" ,"fill_form" , filename + ".fdf", "output", filename + ".pdf"], check = True, env = {"PATH": "./", "LD_LIBRARY_PATH": "/home/camel2go/.local/lib"})
+	run(["qpdf", "--decrypt", "--replace-input", "arbeitszeitnachweis.pdf"], check = True, env = {"PATH": "./", "LD_LIBRARY_PATH": "~/.local/lib"})
+	run(["pdftk", "arbeitszeitnachweis.pdf" ,"fill_form" , filename + ".fdf", "output", filename + ".pdf"], check = True, env = {"PATH": "./", "LD_LIBRARY_PATH": "~/.local/lib"})
 	print(f"[+] all done :)")
