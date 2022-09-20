@@ -5,6 +5,8 @@ from datetime import datetime
 from calendar import different_locale, month_name, monthrange
 from requests import get
 from subprocess import run
+from sys import argv
+import json
 
 
 # https://www.verw.tu-dresden.de/verwricht/formulare/download.asp?file=Arbeitszeitnachweis%20Mindestlohngesetz.pdf
@@ -32,7 +34,6 @@ data = {
 
 
 def fetch_pdf(url_pdf):
-	
 	resp = get(url_pdf)
 
 	# in case we are on the other side of the zih-firewall  
@@ -58,7 +59,6 @@ def get_date() -> datetime:
 
 
 def generate_data(data, date):
-	
 	data["Jahr \(yyyy\)"] = str(date.year)
 	with different_locale("de_DE.UTF-8"):
 		data["Monat"] = month_name[date.month]
@@ -69,10 +69,26 @@ def generate_data(data, date):
 	work_end = f"{int(work_begin[:2]) + work_hours // 1:02.0f}:{int(work_begin[3:]) + (work_hours % 1) * 60:02.0f}"
 
 	for day in range(1, 32):
-		invalid = day > days_in_month or (day + first_day_of_month - 1) % 7 in [5, 6]
-		data[f"Kommen Tag {day} \(hh:mm\)"] = "-" if invalid else work_begin
-		data[f"Gehen Tag {day} \(hh:mm\)"] = "-" if invalid else work_end
-		data[f"tatsächliche Stunden Tag {day}"] = "-" if invalid else work_hours
+		weekday = (day + first_day_of_month - 1) % 7
+		invalid = day > days_in_month or weekday in [5, 6]
+		if invalid:
+			begin = "-"
+			end = "-"
+			hours = "-"
+		elif jsoncall:
+			hours = float(worktime[weekday]["arbeitszeit"])
+			if hours == 0:
+				hours = begin = end = "-"
+			else:
+				begin = worktime[weekday]["startzeit"]
+				end = worktime[weekday]["endzeit"]
+		else:
+			begin = work_begin
+			end = work_end
+			hours = work_hours
+		data[f"Kommen Tag {day} \(hh:mm\)"] = begin
+		data[f"Gehen Tag {day} \(hh:mm\)"] = end
+		data[f"tatsächliche Stunden Tag {day}"] = hours
 		data[f"Bemerkung Tag {day}"] = "-"
 
 	# there is one imposter among us
@@ -101,7 +117,6 @@ def generate_fdf_rec(data):
 	return fdf
 
 def generate_fdf(data):
-	
 	fdf = ""
 	fdf += "%FDF-1.2\n"
 	fdf += "%\n"
@@ -139,7 +154,7 @@ def generate_fdf(data):
 def print_url(url, text):
 	return f"\u001b]8;;{url}\u001b\\{text}\u001b]8;;\u001b\\"
 
-
+jsoncall = False
 if __name__ == "__main__":
 	
 	# try: from fillpdf import fillpdfs
@@ -147,11 +162,31 @@ if __name__ == "__main__":
 		# print("please install " + print_url(url_fillpdf, "fillpdf") + ": \"pip3 install fillpdf\"")
 		# exit(-1)
 
+	if len(argv) == 2:
+		jsoncall = True
+		print("[+] Using provided JSON data!")
+
+		jsonobj = json.loads(argv[1])
+		personal = jsonobj["personal"]
+		worktime = jsonobj["worktime"]
+		mon = jsonobj["month"]
+		data["Geburtsdatum \(dd"] = personal["Geburtsdatum \(dd"]
+		data["Personalnummer"] = personal["Personalnummer"]
+		data["Name, Vorname"] = personal["Name, Vorname"]
+		data["Kostenstelle"] = personal["Kostenstelle"]
+		data["Vorgesetzte:r"] = personal["Vorgesetzte:r"]
+		data["Struktureinheit"] = personal["Struktureinheit"]
+		data["Vertragslaufzeit"] = personal["Vertragslaufzeit"]
+		data["Vereinbarte Wochenarbeitszeit"] = personal["Vereinbarte Wochenarbeitszeit"]
+
 	print("[+] trying to fetch newest pdf from verw.tu-dresden.de...")
 	pdf = fetch_pdf(url_pdf)
 	print("[+] successfully fetched pdf!")
 
-	date = get_date()
+	if not jsoncall:
+		date = get_date()
+	else:
+		date = datetime(year=int(mon["year"]), month=int(mon["month"]), day=1)
 
 	print("[+] generating fill-data...", end="")
 	data = generate_data(data, date)

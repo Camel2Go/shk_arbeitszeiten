@@ -11,7 +11,7 @@
         $personal["Kostenstelle"] = $_POST["kostenstelle"];
         $personal["Vorgesetzte:r"] = $_POST["vorgesetzte:r"];
         $personal["Struktureinheit"] = $_POST["struktureinheit"];
-        $personal["Wochenstunden"] = str_replace(",", ".", $_POST["wochenstunden"]);
+        $personal["Vereinbarte Wochenarbeitszeit"] = str_replace(",", ".", $_POST["wochenstunden"]);
 
         $worktime = array();
         $gesamtstunden = 0;
@@ -38,7 +38,7 @@
         $fillmonth = explode("-", $_POST["month"]);
         $month = array("year" => $fillmonth[0], "month" => $fillmonth[1]);
 
-        if($gesamtstunden == floatval($personal["Wochenstunden"])) {
+        if($gesamtstunden == floatval($personal["Vereinbarte Wochenarbeitszeit"])) {
             $json = json_encode(array("personal" => $personal, "worktime" => $worktime, "month" => $month));
             echo $json;
 
@@ -214,7 +214,7 @@
                         $end = ($month + 5) % 12;
                         $i = $begin;
                         while($i != $month) {
-                            echo "<option value='" . (($i > $month) ? $year + 1 : $year) . "-" . ($i + 1) . "'>" . $months[$i] . "</option>";
+                            echo "<option value='" . (($i > $month) ? $year + 1 : $year) . "-" . ($i + 1) . "'>" . $months[$i] . "</option>"; // maybe $year - 1?
                             $i = ($i + 1) % 12;
                         }
                         echo "<option selected value='" . $year . "-" . ($month + 1) . "'>" . $months[$month] . "</option>";
