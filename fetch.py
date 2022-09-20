@@ -14,13 +14,13 @@ pdf = get(url_pdf)
 
 # in case we are on the other side of the zih-firewall  
 while not "application/pdf" in pdf.headers.get("Content-Type"):
-
 	print("[!] couldn't fetch pdf, got \"" + pdf.headers.get("Content-Type") + "\" instead of \"application/pdf\"")
 	print("[!] please either connect with " + print_url(url_vpn, "VPN") +", or go to " + print_url(url_pdf, "verw.tu-dresden.de") + ", login and paste presented link here")
 	user = input("[#] (enter for vpn | paste url) > ")
 	if "sid=" in user: cookies ["TuVerw"] = "tuvSID=" + user[user.index("sid=") + 4:]
 	elif user: print("[!] wrong url, please paste the one presented under \"Bitte hier klicken, um die angeforderte Seite abzurufen.\" :)")
 	pdf = get(url_pdf, cookies = cookies)
+
 print("[+] successfully fetched pdf!")
 
 

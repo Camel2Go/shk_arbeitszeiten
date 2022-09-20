@@ -40,27 +40,35 @@
 
         if($gesamtstunden == floatval($personal["Vereinbarte Wochenarbeitszeit"])) {
             $json = json_encode(array("personal" => $personal, "worktime" => $worktime, "month" => $month));
-            echo $json;
+            $escapedjson = str_replace('"', '\"', $json);
 
             // execute python file
-            // filename will be either known from input or returned by python script
-            // $filename = "arbeitszeitnachweis.pdf";
+            // $ret = system("python3 script.py " . $json, $output);
+            if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
+                exec("python script.py \"" . $escapedjson . "\"", $output);
+            } else {
+                exec("python script.py '" . $json . "'", $output);
 
-            // // download finished pdf
-            // if(file_exists($filename)) {
-            //     header('Content-Description: File Transfer');
-            //     header('Content-Type: application/octet-stream');
-            //     header('Expires: 0');
-            //     header('Content-Disposition: attachment; filename="' . basename($filename) . '"');
-            //     header('Content-Length: ' . filesize($filename));
-            //     header('Pragma: public'); //?
+            }
+            $filename = $output[0] . ".pdf";
 
-            //     flush();
-            //     readfile($filename);
-            //     die();
-            // }
+            // download finished pdf
+            if(file_exists($filename)) {
+                header('Content-Description: File Transfer');
+                header('Content-Type: application/octet-stream');
+                header('Expires: 0');
+                header('Content-Disposition: attachment; filename="' . basename($filename) . '"');
+                header('Content-Length: ' . filesize($filename));
+                header('Pragma: public'); //?
 
-            // delete pdf
+                flush();
+                readfile($filename);
+
+                // delete pdf
+                unlink($filename);
+
+                die();
+            }
         } else {
             $error = "Mehr Stunden gearbeitet als angegeben.";
         }

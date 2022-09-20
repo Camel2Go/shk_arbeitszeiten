@@ -75,12 +75,11 @@ def generate_data(data, date):
 	data["Gehen Tag 30"] = data.pop("Gehen Tag 30 \(hh:mm\)")
 
 	data["Gesamtstundenzahl"] = f"{sum([value for key, value in data.items() if 'tatsächliche Stunden Tag' in key and value != '-']):02.1f}"
-	
+
 	return data
 
 
 def generate_fdf_rec(data):
-	
 	fdf = ""
 	for key, value in data.items():
 		fdf += "<<\n"
@@ -131,12 +130,13 @@ def generate_fdf(data):
 
 
 if __name__ == "__main__":
-	
 	jsoncall = False
 
-	if len(argv) == 2:
+	if len(argv) >= 2:
 		jsoncall = True
-		print("[+] Using provided JSON data!")
+		verbose = True if len(argv) >= 3 and (argv[2] == "--verbose" or argv[2] == "-v") else False
+		if verbose:
+			print("[+] Using provided JSON data!")
 
 		jsonobj = json.loads(argv[1])
 		personal = jsonobj["personal"]
@@ -154,28 +154,43 @@ if __name__ == "__main__":
 	date = datetime(year=int(mon["year"]), month=int(mon["month"]), day=1) if jsoncall else get_date()
 
 
-	print("[+] generating fill-data...", end="")
+	if verbose:
+		print("[+] generating fill-data...", end="")
 	data = generate_data(data, date)
-	print("done!")
-	
-	print("[+] generating fdf-file...", end="")
+	if verbose:
+		print("done!")
+
+	if verbose:
+		print("[+] generating fdf-file...", end="")
 	fdf = generate_fdf(data)
-	print("done!")
+	if verbose:
+		print("done!")
 
 	filename = month_name[date.month].lower() + "_" + data["Name, Vorname"].replace(" ", "_").replace(",", "").lower()
-	
-	print(f"[+] writing \"{filename}.fdf\" to disk...", end="")
+
+	if verbose:
+		print(f"[+] writing \"{filename}.fdf\" to disk...", end="")
 	with open(filename + ".fdf", "wb") as file:
 		file.write(fdf)
-	print("done!")
+	if verbose:
+		print("done!")
 
 	# fillpdfs.write_fillable_pdf("arbeitszeitnachweis.pdf", filename + ".pdf", data)
-	print("[+] executing pdftk to generate filled pdf...", end="")
+	# print(f"[+] pdftk arbeitszeitnachweis.pdf fill_form {filename}.fdf output {filename}.pdf")
+	if verbose:
+		print("[+] executing qpdf and pdftk to generate filled pdf...", end="")
 	run(["pdftk", "arbeitszeitnachweis.pdf" ,"fill_form" , filename + ".fdf", "output", filename + ".pdf"], check = True, env = {"PATH": "./", "LD_LIBRARY_PATH": "./"})
-	print("done!")
+	if verbose:
+		print("done!")
 
-	print(f"[+] removing \"{filename}.fdf\"...", end="")
+	if verbose:
+		print(f"[+] removing \"{filename}.fdf\"...", end="")
 	remove(filename + ".fdf")
-	print("done!")
+	if verbose:
+		print("done!")
 
-	print(f"[+] all done :)")
+	if not verbose:
+		print(filename)
+
+	if verbose:
+		print(f"[+] all done :)")
