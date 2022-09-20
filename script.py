@@ -18,13 +18,13 @@ from os import remove
 
 data = {
 		"Arbeitsbeginn": "08:00",					
-		"Geburtsdatum \(dd": {"mm": {"yyyy\)": "26.06.2001"}},
-		"Personalnummer": "00267848",
-		"Name, Vorname": "Gutmann, Artur",
-		"Kostenstelle": "1110407G",
-		"Vorgesetzte:r": "Schmutzler, Ludwig",
-		"Struktureinheit": "Professur für Computergraphik und Visualisierung",
-		"Vertragslaufzeit": "05.22 - 09.22",
+		"Geburtsdatum \(dd": {"mm": {"yyyy\)": "01.01.0101"}},
+		"Personalnummer": "12345678",
+		"Name, Vorname": "Mustermann, Max",
+		"Kostenstelle": "1234567A",
+		"Vorgesetzte:r": "Mustermann, Moritz",
+		"Struktureinheit": "Professur für Staatsgeheimnisse",
+		"Vertragslaufzeit": "01.01 - 02.02",
 		"Vereinbarte Wochenarbeitszeit": "5.5",
 	}
 
@@ -132,11 +132,6 @@ def generate_fdf(data):
 
 if __name__ == "__main__":
 	
-	# try: from fillpdf import fillpdfs
-	# except ModuleNotFoundError: 
-		# print("please install " + print_url(url_fillpdf, "fillpdf") + ": \"pip3 install fillpdf\"")
-		# exit(-1)
-
 	jsoncall = False
 
 	if len(argv) == 2:
