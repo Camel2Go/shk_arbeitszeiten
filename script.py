@@ -6,7 +6,7 @@ from calendar import different_locale, month_name, monthrange
 from subprocess import run
 from sys import argv
 import json
-from os import delete
+from os import remove
 
 
 # https://www.verw.tu-dresden.de/verwricht/formulare/download.asp?file=Arbeitszeitnachweis%20Mindestlohngesetz.pdf
@@ -137,6 +137,8 @@ if __name__ == "__main__":
 		# print("please install " + print_url(url_fillpdf, "fillpdf") + ": \"pip3 install fillpdf\"")
 		# exit(-1)
 
+	jsoncall = False
+
 	if len(argv) == 2:
 		jsoncall = True
 		print("[+] Using provided JSON data!")
@@ -154,14 +156,8 @@ if __name__ == "__main__":
 		data["Vertragslaufzeit"] = personal["Vertragslaufzeit"]
 		data["Vereinbarte Wochenarbeitszeit"] = personal["Vereinbarte Wochenarbeitszeit"]
 
-	print("[+] trying to fetch newest pdf from verw.tu-dresden.de...")
-	pdf = fetch_pdf(url_pdf)
-	print("[+] successfully fetched pdf!")
+	date = datetime(year=int(mon["year"]), month=int(mon["month"]), day=1) if jsoncall else get_date()
 
-	if not jsoncall:
-		date = get_date()
-	else:
-		date = datetime(year=int(mon["year"]), month=int(mon["month"]), day=1)
 
 	print("[+] generating fill-data...", end="")
 	data = generate_data(data, date)
