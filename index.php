@@ -50,7 +50,7 @@
                 $output = shell_exec("python script_python2.py '" . $json . "'");
 
             }
-            $filename = $output[0] . ".pdf";
+            $filename = $output . ".pdf";
 
             // download finished pdf
             if(file_exists($filename)) {
