@@ -45,9 +45,9 @@
             // execute python file
             // $ret = system("python3 script.py " . $json, $output);
             if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
-                exec("python script.py \"" . $escapedjson . "\"", $output);
+                $output = shell_exec("python script.py \"" . $escapedjson . "\"");
             } else {
-                exec("python script.py '" . $json . "'", $output);
+                $output = shell_exec("python script_python2.py '" . $json . "'");
 
             }
             $filename = $output[0] . ".pdf";

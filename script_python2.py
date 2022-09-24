@@ -3,8 +3,6 @@
 
 from datetime import datetime
 from calendar import month_name, monthrange
-import locale
-locale.setlocale(locale.LC_ALL, "de_DE.UTF-8")
 from subprocess import call
 from sys import argv
 import json
@@ -33,7 +31,7 @@ data = {
 
 def generate_data(data, date):
 	data["Jahr \(yyyy\)"] = str(date.year)
-	data["Monat"] = month_name[date.month]
+	data["Monat"] = date.month
 
 	first_day_of_month, days_in_month = monthrange(date.year, date.month)
 
